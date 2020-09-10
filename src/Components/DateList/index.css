@@ -1,0 +1,117 @@
+.card-column{
+  padding : 1rem 3rem;
+}
+*{
+  transition: all .3s ease-in-out;
+}
+
+
+
+.card-full-screen{
+    height : 80vh;
+    width : 95%;
+    margin :0 auto;
+}
+@media (min-width: 992px) { 
+  .card-column{
+  padding : 1rem 0.5rem;
+  }
+  .container{
+    min-height: calc(100vh - 4rem);
+  }
+  .card-full-screen{ 
+      width :30rem;
+      height : auto;
+      margin :0  ;
+  }
+ }
+
+.item-new-button{
+  position: absolute;
+  
+  border-radius: 50%;
+  background-color: green;
+  z-index: 15;
+  bottom:1rem;
+  right :1rem;
+  padding:0.5rem;
+  cursor: pointer;
+   
+}
+.inner-add-icon{
+  background-image: url('./more.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.card-main{
+  position: relative;
+  cursor: pointer;
+  transition: all 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+
+}
+
+.card-menu-icon{
+  padding :0.75rem;
+  border-radius: 50%;
+  background-color: rgb(14, 223, 48);
+  margin-left :1rem;
+}
+.card-menu-icon:hover{
+  background-color: rgb(15, 236, 52);
+}
+
+.card-archive-icon{
+background-image: url('./trash.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.card-share-icon{
+  background-image: url('./share.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.card-archive-edit{
+background-image: url('./pencil.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.card-save-icon{
+  background-image: url('./save.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.card-discard-icon{
+   background-image: url('./close.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:  contain; 
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.card-menu{
+  margin-top: 1rem;
+  display: flex;
+  flex-grow:1;
+  justify-content: flex-end;
+}
