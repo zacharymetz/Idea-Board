@@ -21,13 +21,12 @@
   }
   .card-full-screen{ 
       width :30rem;
-      height : auto;
-      margin :0  ;
+      height : auto; 
   }
  }
 
 .item-new-button{
-  position: absolute;
+  position: fixed;
   
   border-radius: 50%;
   background-color: green;
@@ -114,4 +113,18 @@ background-image: url('./pencil.svg');
   display: flex;
   flex-grow:1;
   justify-content: flex-end;
+}
+
+textarea {
+  border: none!important;
+    background-color: transparent!important;
+    resize: none!important;
+    outline: none!important;
+}
+.textareaInput:focus {
+  border: none!important;
+    background-color: transparent!important;
+    resize: none!important;
+    outline: none!important;
+    
 }

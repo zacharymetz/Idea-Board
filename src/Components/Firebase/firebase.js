@@ -25,6 +25,20 @@ class Firebase {
     this.firestore = app.firestore();
     this.storage = app.storage();
     this.firebase = app;
+    var _this = this;
+    //  if there is no one signed in then we create an anoymouse account for them 
+    this.auth.onAuthStateChanged((user)=>{
+      if(user){}
+      else{
+        _this.auth.signInAnonymously().then((user)=>{
+          console.log( "this is the user", user.user.uid);
+          let firstLogin = user.additionalUserInfo.isNewUser
+          _this.firstLogin = firstLogin;
+        })
+      }
+    });
+    
+
   }
 
   // *** Auth API ***
