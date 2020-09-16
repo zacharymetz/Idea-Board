@@ -29,13 +29,21 @@
   position: fixed;
   
   border-radius: 50%;
-  background-color: green;
+  background-color: #26F110;
   z-index: 15;
   bottom:1rem;
   right :1rem;
   padding:0.5rem;
   cursor: pointer;
    
+}
+.item-media-button{ 
+    
+  cursor: pointer;
+  padding :0.75rem;
+  border-radius: 50%;
+  background-color: #10AEF1;
+  margin-left :1rem;
 }
 .inner-add-icon{
   background-image: url('./more.svg');
@@ -108,6 +116,22 @@ background-image: url('./pencil.svg');
   height: 1.5rem;
   width: 1.5rem;
 }
+.card-attachment-icon{
+  background-image: url('./attach.svg');
+ background-position: center;
+ background-repeat: no-repeat;
+ background-size:  contain; 
+ height: 1.5rem;
+ width: 1.5rem;
+}
+.card-attachment-uploading-icon{
+  background-image: url('./loading.svg');
+ background-position: center;
+ background-repeat: no-repeat;
+ background-size:  contain; 
+ height: 1.5rem;
+ width: 1.5rem;
+}
 .card-menu{
   margin-top: 1rem;
   display: flex;
@@ -127,4 +151,32 @@ textarea {
     resize: none!important;
     outline: none!important;
     
+}
+.attachment-item{
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+
+}
+.attachment-item-text{
+  font-size:8px;
+}
+.unknow-attachment{
+  background-image: url('./files-and-folders.svg');
+ background-position: center;
+ background-repeat: no-repeat;
+ background-size:  contain; 
+ height: 3rem;
+ width: 3rem;
+ margin : 0.5rem;
+ border-radius: 5px;
+ border :1px solid black;
+}
+
+.attachment-thumbnail{
+  height: 4rem;
+ width: 4rem;
+ border-radius: 5px;
+ border :1px solid black;
+ 
 }

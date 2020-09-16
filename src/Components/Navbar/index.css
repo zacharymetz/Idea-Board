@@ -6,15 +6,17 @@
   background-color:  #E5E5E5;
   z-index: 10;
   display: flex;
-  padding : 0.5rem
+  padding : 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 300;
 }
 
 .logo-icon{
-  background-image: url('./invention.svg');
+  background-image: url('./finance.svg');
     background-position: center;
     background-repeat: no-repeat;
     background-size:  contain; 
-    height: 1.5rem;
-    width: 1.5rem;
-    margin-right : 1rem;
+    height: 2.5rem;
+    width: 2.5rem;
+    margin-right : 0.0rem;
   }

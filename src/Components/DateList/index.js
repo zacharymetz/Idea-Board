@@ -3,9 +3,8 @@ import { Container, Card, Row, Col, Tooltip,Form, FormGroup, Label, Input, FormT
 import './index.css'
 import { withFirebase } from '../Firebase'
 import NavBar from '../Navbar'
-
 import AuthModal from '../AuthenticationModal'
-
+var path = require('path')
 
 export default withFirebase(class extends Component{
   constructor(props){
@@ -190,21 +189,48 @@ const ListItem = withFirebase( class  extends Component{
   constructor(props){
     super(props);
     console.log(props)
-     this.textRef = React.createRef()
+    this.fileRef = React.createRef();
+
     this.state = {
       //  the edititng varaibles 
       view :   props.view == false ? false : true,
       edit : props.edit == false ? false : true,
 
+      uploadingFile : false,
+
       //  the variables of the inputs 
       title : this.props.data.title,
       description : this.props.data.description,
+      attachments : []
 
 
 
 
     }
+    this.loadAttachments();
   }
+
+  async loadAttachments(){
+    const { userid, id } = this.props.data;
+    let attachmentsResults = await this.props.firebase.firestore.collection("user").doc(userid).collection('ideas').doc(id).collection('attachments').get();
+    
+
+
+    let attachments = [];
+    for(let doc of attachmentsResults.docs){
+      console.log("the doc that matters ", doc)
+      attachments.push({
+        id : doc.id,
+        ... doc.data(),
+        userid : userid,
+        ideaid : id
+      });
+    }
+    this.setState({ attachments })
+  }
+
+
+
   resizeInputs(){
     const { id } = this.props.data;
     document.getElementById("title-"+id).style.height = 'inherit'
@@ -253,7 +279,60 @@ const ListItem = withFirebase( class  extends Component{
           const target = e.target;
           console.log(e.target)
         });
-    }
+  }
+  uploadAttachment(){
+    //  make sure to click the file input 
+    const {  id } = this.props.data;
+    const { uploadingFile } = this.state; 
+    if(!uploadingFile)
+      document.getElementById('file-'+id).click();
+  }
+  //  automatically upload the file to firestore storage then 
+  async handleFileChange(e){
+    let file = e.target.files[0];
+    const { userid, id } = this.props.data;
+    this.setState({
+      uploadingFile : true
+    })
+    console.log(file)
+     
+
+    //  make sure to upload the file and add it to the card in firebase 
+    //  in the attachments collection for this document 
+    var storageRef = this.props.firebase.storage.ref();
+    let fileExtention = path.extname(file.name);
+    // Create a reference to the user and card by the id so we can restrict access later 
+    var imageRef = storageRef.child('/'+ userid +'/'+ id +'/'+uuidv4()+fileExtention);
+    
+    
+    await imageRef.put(file);
+
+    let longLivedUrl = await imageRef.getDownloadURL();
+
+
+
+    let firestoreResult = await this.props.firebase.firestore
+          .collection("user").doc(userid)
+          .collection('ideas').doc(id)
+          .collection('attachments') .add({
+              name : file.name,
+              size : file.size,
+              type : file.type,
+              lastModified : file.lastModified,
+              url : longLivedUrl
+          });
+
+    this.loadAttachments();
+    //  when we get to here the image is all registed and we can clear
+    //  the file upload 
+    document.getElementById('file-'+id).value = []
+    this.setState({
+      uploadingFile : false
+    });
+    
+
+
+  }
   toggleView(){
     this.setState({
       view : ! this.state.view
@@ -285,7 +364,7 @@ const ListItem = withFirebase( class  extends Component{
     });
   }
   render(){
-    const { view, edit, title, description } = this.state;
+    const { view, edit, uploadingFile, attachments, title, description } = this.state;
     const { id } = this.props.data;
     var _this = this; 
     let outerStyle = {};
@@ -302,20 +381,23 @@ const ListItem = withFirebase( class  extends Component{
       outerStyle = {position : "fixed",top : 0, left : 0, zIndex : 20, height : "100vh", width : "100%", display : "flex", alignItems : "center", justifyContent : "center"}
        
       cardViewStyle= "card-full-screen";
-      menu = [<CardButton toolTipText={"Delete"} iconClass={"card-archive-icon"} onClick={()=>{_this.archiveIdea()}} />,
-      <CardButton toolTipText={"Share"} iconClass={"card-share-icon"} />,
+      menu = [<CardButton toolTipText={"Delete"}  id={id} iconClass={"card-archive-icon"} onClick={()=>{_this.archiveIdea()}} />,
+      
                ];
 
       if(!edit){
-        menu.push(<CardButton
+        menu.push(<CardButton id={id} toolTipText={"Share"} iconClass={"card-share-icon"} />)
+        menu.push(<CardButton  id={id}
           onClick={()=>_this.startEdit()}
         
          toolTipText={"Edit"} iconClass={"card-archive-edit"} /> )
       }else{
-        menu.push(<CardButton
+        menu.push(<CardButton  id={id}
+          onClick={()=>_this.uploadAttachment()}
+         toolTipText={"Attachment"} iconClass={uploadingFile ? "card-attachment-uploading-icon" : "card-attachment-icon"} />,<CardButton  id={id}
           onClick={()=>_this.saveEdit()}
          toolTipText={"Save"} iconClass={"card-save-icon"} />,
-         <CardButton
+         <CardButton  id={id}
           onClick={()=>_this.discardEdit()}
          toolTipText={"Discard"} iconClass={"card-discard-icon"} /> );;
 
@@ -358,9 +440,13 @@ const ListItem = withFirebase( class  extends Component{
                 className="textareaInput"
                 onChange={(event)=>_this.onChange(event)}
                 placeholder="password placeholder" />  
+
+<input id={"file-"+id} onChange={(event)=>_this.handleFileChange(event)} name={"file"} type='file' hidden/>
             </div>
           )
       }
+      menu = menu.reverse()
+      
       
     } 
     return ( 
@@ -369,6 +455,7 @@ const ListItem = withFirebase( class  extends Component{
     <div style={outerStyle}>
       <div style={{zIndex : 25}} ><Card onClick={()=>{if(!view){_this.toggleView()}}} className={"shadow card-main  "+cardViewStyle} body >
             {innerCard}
+            <AttachemntList attachments={attachments} />
             <div className="card-menu">
                     {menu}
                     </div>
@@ -398,16 +485,84 @@ const CardButton = (props) => {
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const toggle = () => setTooltipOpen(!tooltipOpen);
-
+  let ids = uuidv4().replace("-","")
   return (
     <div>
        
-      <div onClick={props.onClick} id="TooltipExample" className="card-menu-icon shadow">
+      <div onClick={props.onClick} id={props.id+props.toolTipText} className="item-media-button shadow">
                 <div className={props.iconClass} />
               </div>
-      <Tooltip placement="top" isOpen={tooltipOpen} target="TooltipExample" toggle={toggle}>
-        {props.toolTipText}
-      </Tooltip>
+       
     </div>
   );
+}
+
+
+
+const AttachemntList = withFirebase(class extends Component{
+  render(){
+    const { attachments } = this.props;
+    console.log("ASDASDASDSADSDA",attachments)
+    let attachmentElements = [];
+    for(let attachemnt of attachments){
+      attachmentElements.push(
+        <AttachemntListItem 
+          url={attachemnt.url}
+          name={attachemnt.name}
+          type={attachemnt.type}
+        />
+      )
+    }
+    return(
+    <div style={{display : "flex",flexDirection : "column", overflow: "hidden"}}>{attachmentElements}</div>
+    )
+  }
+});
+
+
+const AttachemntListItem = withFirebase(class extends Component{
+  render(){
+    const { name,url, type } = this.props;
+    let img =  <img     className="  attachment-thumbnail"    />;
+    let label = "Attachment"
+    console.log(type)
+
+    //  if its an image it can go in an image tag
+    if(type == "image/png" || type == "image/svg+xml" || type=="image/svg"){
+      img = <img  src={url}  className="  attachment-thumbnail"   />;
+      label = "Image"
+    }
+    return(
+    <div onClick={()=>{
+      //  when you click on it if its an image you should go 
+      //   full screen with it 
+
+
+
+      //  if not you should just download it 
+      window.open(url)
+    }} className="attachment-item" >
+      { img }
+      <div className="attachment-item-text">
+      { label }
+      </div>
+      <div className="">
+
+      </div>
+    </div>
+    )
+  }
+});
+
+
+
+
+
+
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
