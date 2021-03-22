@@ -1,6 +1,6 @@
 import React, {  Component } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, Alert, FormGroup, Label, Input, FormText } from 'reactstrap';
-import { withFirebase } from '../Firebase';
+import { withFirebase } from '../../../Components/Firebase';
 
 
 export default withFirebase(class extends Component{

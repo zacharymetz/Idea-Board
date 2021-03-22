@@ -1,0 +1,181 @@
+.card-column{
+    padding : 1rem 3rem;
+  }
+  *{
+    transition: all .3s ease-in-out;
+  }
+  
+  
+  
+  .card-full-screen{
+      height : 80vh;
+      width : 95%;
+      margin :0 auto;
+  }
+  @media (min-width: 992px) { 
+    .card-column{
+    padding : 1rem 0.5rem;
+    }
+    .container{
+      min-height: calc(100vh - 4rem);
+    }
+    .card-full-screen{ 
+        width :30rem;
+        height : auto; 
+    }
+   }
+  
+  .item-new-button{
+    position: fixed;
+    
+    border-radius: 50%;
+    background-color: #26F110;
+    z-index: 15;
+    bottom:1rem;
+    right :1rem;
+    padding:0.5rem;
+    cursor: pointer;
+     
+  }
+  .item-media-button{ 
+      
+    cursor: pointer;
+    padding :0.75rem;
+    border-radius: 50%;
+    background-color: #10AEF1;
+    margin-left :1rem;
+  }
+  .inner-add-icon{
+    background-image: url('../IdeaBoardItemComponent/more.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  .card-main{
+    position: relative;
+    cursor: pointer;
+    transition: all 1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  
+  
+  }
+  
+  .card-menu-icon{
+    padding :0.75rem;
+    border-radius: 50%;
+    background-color: rgb(14, 223, 48);
+    margin-left :1rem;
+  }
+  .card-menu-icon:hover{
+    background-color: rgb(15, 236, 52);
+  }
+  
+  .card-archive-icon{
+  background-image: url('../IdeaBoardItemComponent/trash.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  
+  .card-share-icon{
+    background-image: url('../IdeaBoardItemComponent/share.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  
+  .card-archive-edit{
+  background-image: url('../IdeaBoardItemComponent/pencil.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  .card-save-icon{
+    background-image: url('../IdeaBoardItemComponent/save.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  .card-discard-icon{
+     background-image: url('../IdeaBoardItemComponent/close.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:  contain; 
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  .card-attachment-icon{
+    background-image: url('../IdeaBoardItemComponent/attach.svg');
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size:  contain; 
+   height: 1.5rem;
+   width: 1.5rem;
+  }
+  .card-attachment-uploading-icon{
+    background-image: url('../IdeaBoardItemComponent/loading.svg');
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size:  contain; 
+   height: 1.5rem;
+   width: 1.5rem;
+  }
+  .card-menu{
+    margin-top: 1rem;
+    display: flex;
+    flex-grow:1;
+    justify-content: flex-end;
+  }
+  
+  textarea {
+    border: none!important;
+      background-color: transparent!important;
+      resize: none!important;
+      outline: none!important;
+  }
+  .textareaInput:focus {
+    border: none!important;
+      background-color: transparent!important;
+      resize: none!important;
+      outline: none!important;
+      
+  }
+  .attachment-item{
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+  
+  }
+  .attachment-item-text{
+    font-size:8px;
+  }
+  .unknow-attachment{
+   background-image: url('../IdeaBoardItemComponent/files-and-folders.svg');
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size:  contain; 
+   height: 3rem;
+   width: 3rem;
+   margin : 0.5rem;
+   border-radius: 5px;
+   border :2px solid black;
+  }
+  
+  .attachment-thumbnail{
+    height: 5rem;
+    width: 5rem;
+    border-radius: 5px;
+    border :1px solid black;
+  }

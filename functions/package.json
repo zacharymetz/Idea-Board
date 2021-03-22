@@ -13,6 +13,9 @@
   },
   "main": "index.js",
   "dependencies": {
+    "avatar-builder": "^1.0.1",
+    "avatar-generator": "^2.0.4",
+    "faker": "^5.4.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.1"
   },

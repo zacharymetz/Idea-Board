@@ -3,7 +3,9 @@ import { Container, Card, Row, Col, Tooltip,Form, FormGroup, Label, Input, FormT
 import './index.css'
 import { withFirebase } from '../Firebase'
 import NavBar from '../Navbar'
-import AuthModal from '../AuthenticationModal'
+import AuthModal from '../../helpers/Components/AuthenticationModal'
+import Truncate from 'react-truncate';
+import FileImg from './files-and-folders.svg'
 var path = require('path')
 
 export default withFirebase(class extends Component{
@@ -125,54 +127,19 @@ export default withFirebase(class extends Component{
   render(){
     var _this =this;
     const { items,loginModalOpen  } = this.state;
-
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "Sept", "October", "November", "December"
-      ];
-
-    //  first we need to split them up by day 
-    let itemsPerDay = {};
-    for(let item of items ){
-      //  check the day (dayofMonth, month and year)
-      let date = new Date(item.date) 
-      var dd = String(date.getDate()).padStart(2, '0'); 
-      var mm =  date.getMonth() 
-      var yyyy = date.getFullYear();  
-      let dateString =   monthNames[mm] + ' ' + dd; // + '/' + yyyy; 
-      if(itemsPerDay[dateString] == null){
-        //  the list of idea for that day is empty so we need to add one 
-        itemsPerDay[dateString] = [item];
-      }else{
-        //  the list of ideas for that day exists so we just need to add to it 
-        itemsPerDay[dateString].push(item);
-      }
-    }
-    let lists = [];
-    for(let dateString of Object.keys(itemsPerDay)){
-      //  first add the date thing 
-      lists.push(<h3>{dateString}</h3>)
-
-      //  then create a new list to add to the row then to the list 
-      let ideasInDay = itemsPerDay[dateString];
-      let listItems = [];
-      for(let item of ideasInDay){
-        if(!item.archived)
-          listItems.push( <ListItem key={item.id} data={item} view={item.inital} edit={item.inital} /> )
-      }
-      lists.push(<Row>
-        {listItems}
-       </Row>)
-
-      
-    }
-
-
- 
+    
     return (
     <div>
       <NavBar toggleModal={()=>_this.setState({loginModalOpen : !_this.state.loginModalOpen})} />
       <Container style={{marginTop : "1rem", position : "relative", }}>
-        {lists}
+      <Row>
+        {items.map(item=><ListItem 
+                            key={item.id} 
+                            data={item} 
+                            view={item.inital} 
+                            edit={item.inital} 
+                          />)}
+      </Row>
           <AddButton onClick={()=>{
             //  
             _this.createNewEntry();
@@ -201,7 +168,9 @@ const ListItem = withFirebase( class  extends Component{
       //  the variables of the inputs 
       title : this.props.data.title,
       description : this.props.data.description,
-      attachments : []
+      attachments : [],
+      sizeBeforeModal : 0,
+      mainId : uuidv4(),
 
 
 
@@ -334,8 +303,12 @@ const ListItem = withFirebase( class  extends Component{
 
   }
   toggleView(){
+    const { mainId } = this.state;
+    
     this.setState({
-      view : ! this.state.view
+      view : ! this.state.view,
+      sizeBeforeModal : this.state.view ? 0 : document.getElementById(mainId).clientHeight
+
     })
   }
   startEdit(){
@@ -355,7 +328,7 @@ const ListItem = withFirebase( class  extends Component{
   discardEdit(){
     //  set the state to the props 
     const { title, description } = this.props.data;
-
+    
 
 
     this.setState({
@@ -364,16 +337,20 @@ const ListItem = withFirebase( class  extends Component{
     });
   }
   render(){
-    const { view, edit, uploadingFile, attachments, title, description } = this.state;
-    const { id } = this.props.data;
+    const { view, edit, uploadingFile, attachments, title, description, mainId, sizeBeforeModal } = this.state;
+    const { id, key, date  } = this.props.data;
     var _this = this; 
     let outerStyle = {};
     let background;
     let cardViewStyle = "";
     let menu;
-    let innerCard = (<div><h4 style={{fontWeight : "400"}}>{title} </h4>
-                    <p>{description}</p>
+    let innerCard = (<div style={{marginBottom : "1rem"}}>
+                  <h4 style={{fontWeight : "400"}}>{title} </h4>
+                    <Truncate lines={view ? null : 3}>
+                      <p>{description}</p>
+                    </Truncate>
                     </div>)
+    
     if(view){
          
       background = <div onClick={()=>_this.toggleView()}  style={{position : "absolute",top : 0, left : 0, zIndex : 20, height : "100vh", width : "100%", backgroundColor : " black", opacity : 0.65}}/>;
@@ -381,9 +358,7 @@ const ListItem = withFirebase( class  extends Component{
       outerStyle = {position : "fixed",top : 0, left : 0, zIndex : 20, height : "100vh", width : "100%", display : "flex", alignItems : "center", justifyContent : "center"}
        
       cardViewStyle= "card-full-screen";
-      menu = [<CardButton toolTipText={"Delete"}  id={id} iconClass={"card-archive-icon"} onClick={()=>{_this.archiveIdea()}} />,
-      
-               ];
+      menu = [];
 
       if(!edit){
         menu.push(<CardButton id={id} toolTipText={"Share"} iconClass={"card-share-icon"} />)
@@ -399,7 +374,8 @@ const ListItem = withFirebase( class  extends Component{
          toolTipText={"Save"} iconClass={"card-save-icon"} />,
          <CardButton  id={id}
           onClick={()=>_this.discardEdit()}
-         toolTipText={"Discard"} iconClass={"card-discard-icon"} /> );;
+         toolTipText={"Discard"} iconClass={"card-discard-icon"} /> );
+         menu.push(<CardButton toolTipText={"Delete"}  id={id} iconClass={"card-archive-icon"} onClick={()=>{_this.archiveIdea()}} />)
 
 
 
@@ -450,28 +426,44 @@ const ListItem = withFirebase( class  extends Component{
       
     } 
     return ( 
-    <Col lg="4" className="card-column "  >
-     
-    <div style={outerStyle}>
-      <div style={{zIndex : 25}} ><Card onClick={()=>{if(!view){_this.toggleView()}}} className={"shadow card-main  "+cardViewStyle} body >
+    <Col lg="4" className="card-column " key={key} >
+      {/* dummy card for when it is in the modal position */}
+      {view ? <Card  style={{ paddingTop : sizeBeforeModal }} className={"shadow card-main"} /> : null}
+      <div style={outerStyle}>
+      
+      <div style={{zIndex : 25}} >
+        <Card onClick={()=>{if(!view){_this.toggleView()}}} id={mainId} className={"shadow card-main  "+cardViewStyle} body style={{maxHeight : "90vh" , overflowY : "scroll"}}>
             {innerCard}
-            <AttachemntList attachments={attachments} />
+            <AttachemntList attachments={attachments} view={view} />
             <div className="card-menu">
-                    {menu}
-                    </div>
-            </Card></div>
+                {menu}
+            </div>
+            <small className="text-muted" style={{textAlign:"right"}}>
+              {getFormattedDate(new Date(date))}
+            </small>
+            
+        </Card>
+            </div>
        {background}
     </div>
-      
-     
-    
-      
+
     </Col>
     )
   }
   
 })
+function getFormattedDate(date) {
+  var year = date.getFullYear();
 
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+  
+  return (date.getHours() % 12 == 0 ? 12 : date.getHours() % 12 ) + ":" + date.getMinutes()  + (date.getHours() / 12 == 0 ? "am" : "pm") +  " " + month + '/' + day + '/' + year;
+
+}
 
 const AddButton = (props) =>{
   return ( 
@@ -501,20 +493,43 @@ const CardButton = (props) => {
 
 const AttachemntList = withFirebase(class extends Component{
   render(){
-    const { attachments } = this.props;
-    console.log("ASDASDASDSADSDA",attachments)
+    var { attachments, view } = this.props;
+    console.log("ASDASDASDSADSDA",{attachments})
     let attachmentElements = [];
-    for(let attachemnt of attachments){
-      attachmentElements.push(
-        <AttachemntListItem 
-          url={attachemnt.url}
-          name={attachemnt.name}
-          type={attachemnt.type}
-        />
-      )
+    if(view){
+      
+    
+      for(let attachemnt of attachments){
+        attachmentElements.push(
+          <AttachemntListItem 
+            url={attachemnt.url}
+            name={attachemnt.name}
+            type={attachemnt.type}
+          />
+        )
+      }
+    }else{
+      for(let i=0;i<attachments.length && i< 3; i++ ){
+        let attachemnt = attachments[i]
+        attachmentElements.push(
+          <AttachemntListItem 
+            url={attachemnt.url}
+            name={attachemnt.name}
+            type={attachemnt.type}
+          />
+        )
+      }
+      // then add how many more there are to the ... 
+      if(attachments.length > 3)
+        attachmentElements.push(
+          <div className="text-muted" style={{marginBottom : "1rem"}}>
+            {"+"+(attachments.length - 3) + "..."}
+          </div>
+          
+          )
     }
     return(
-    <div style={{display : "flex",flexDirection : "column", overflow: "hidden"}}>{attachmentElements}</div>
+    <div style={{display : "flex",flexDirection : "row", flexWrap : "wrap", width : "100%", alignItems : "flex-end"}}>{attachmentElements}</div>
     )
   }
 });
@@ -525,12 +540,15 @@ const AttachemntListItem = withFirebase(class extends Component{
     const { name,url, type } = this.props;
     let img =  <img     className="  attachment-thumbnail"    />;
     let label = "Attachment"
-    console.log(type)
+    console.log("here is some things",this.props)
 
     //  if its an image it can go in an image tag
-    if(type == "image/png" || type == "image/svg+xml" || type=="image/svg"){
+    if(type.split("/")[0] == "image"){
       img = <img  src={url}  className="  attachment-thumbnail"   />;
       label = "Image"
+    }else{
+      img = <img  src={FileImg}  className="  attachment-thumbnail" style={{padding:"6px"}}   />;
+      
     }
     return(
     <div onClick={()=>{
@@ -541,11 +559,29 @@ const AttachemntListItem = withFirebase(class extends Component{
 
       //  if not you should just download it 
       window.open(url)
-    }} className="attachment-item" >
-      { img }
-      <div className="attachment-item-text">
-      { label }
-      </div>
+    }} className="attachment-item" style={{display : "flex", flexDirection : "column"}}>
+     
+      {  true ?   <div style={{ position : "relative" }}>
+        {img}
+        <div style={{
+              width : "100%",
+              position : "absolute",
+              left : 0,
+              bottom : 0,
+              paddingLeft : 4
+
+        }}
+        className="attachment-item-text"
+        >
+          
+        <Truncate width={64}>
+          {type.split("/")[0] == "image" ? " " :  name}
+        </Truncate>
+          
+          
+        </div>
+      </div> : null }
+      
       <div className="">
 
       </div>
